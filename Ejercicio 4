@@ -137,17 +137,22 @@ p(D) = p(ad0/GPA2&r1)*p(GPA2/r1)*p(r1);
 p(ad0/r1) = [p(A) + p(B) + p(C) + p(D)];
 
 
-//ahora tengo que buscar P(GRE1&GPA2/r1) para ellos busco P(GRE1&GPA2&r(i)) con i de 1 a 4 y luego
-//P(GRE1&GPA2/r1) = P(GRE1&GPA2&r1) / suma P(GRE1&GPA2&r(i))
+//ahora tengo que buscar P(GRE1&GPA2/r1) para ellos busco:
+  //A_ P(GRE1&GPA2&r1).
+  //B_ P(GRE2&GPA2&r1)
+  //C_ P(GRE2&GPA1&r1)
+  //D_ P(GRE1&GPA1&r1)
+// Finalmente P(GRE1&GPA2/r1) = P(A) / (P(A) + P (B) + P(C) + P(D))
+
 
 tot = GRE1&GPA2&r1 + GRE1&GPA2&r2 + GRE1&GPA2&r3 + GRE1&GPA2&r4;
 P(GRE1&GPA2&r1) = (GRE1&GPA2&r1 + 1)/(tot + 4);
-P(GRE1&GPA2&r2) = (GRE1&GPA2&r2 + 1)/(tot + 4);
-P(GRE1&GPA2&r3) = (GRE1&GPA2&r3 + 1)/(tot + 4);
-P(GRE1&GPA2&r4) = (GRE1&GPA2&r4 + 1)/(tot + 4);
+P(GRE2&GPA2&r1) = (GRE2&GPA2&r2 + 1)/(tot + 4);
+P(GRE2&GPA1&r1) = (GRE2&GPA1&r1 + 1)/(tot + 4);
+P(GRE1&GPA1&r1) = (GRE1&GPA1&r1 + 1)/(tot + 4);
 // para la correccion de laplace tomo 4 categorias 
 
 
-totp = P(GRE1&GPA2&r1)+P(GRE1&GPA2&r2)+P(GRE1&GPA2&r3)+P(GRE1&GPA2&r4);
+totp = P(GRE1&GPA2&r1)+P(GRE2&GPA2&r1)+P(GRE1&GPA1&r1)+P(GRE1&GPA1&r1);
 
 P(GRE1&GPA2/r1)=P(GRE1&GPA2&r1)/totp;
