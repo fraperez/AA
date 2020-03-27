@@ -85,39 +85,48 @@ for lista de comienzo a final
 // B_p(r1,GRE2,ad0)
 // C_p(r1,GPA1,ad0)
 // D_p(r1,GPA2,ad0)
-   
-p(r1) = r1/total;
-p(GRE1&r1) = GRE1&r1/total
-p(GRE2&r1) = GRE2&r1/total
-p(ad0&GRE1&r1) = ad0&GRE1&r1/total
-p(ad1&GRE1&r1) = ad1&GRE1&r1/total
+
+
+// voy a aplicar la correccion de Laplace en todos para evitar que se anulen las productorias
+
+p(r1) = (r1+1)/(total+4);
+// hay 4 clases de rankings
+
+p(GRE1&r1) = (GRE1&r1+1)/(total + 2);
+p(GRE2&r1) = (GRE2&r1+1)/(total + 2);
+//solo tomo para la correccion las clases GRE1&r1 y GRE2&r1
+
+p(ad0&GRE1&r1) = (ad0&GRE1&r1 + 1)/(total + 2);
+p(ad1&GRE1&r1) = (ad1&GRE1&r1 + 1)/(total + 2);
+//solo tomo para la correccion las clases ad0&GRE1&r1 y ad1&GRE1&r1
 
 p(GRE1/r1) = p(GRE1&r1)/[p(GRE1&r1)+p(GRE2&r1)];
 p(ad0/GRE1&r1) = p(ad0&GRE1&r1)/[p(ad0&GRE1&r1)+p(ad1&GRE1&r1)];
-
+//Como ya aplique la aplique la correccion de Laplace me aseguro que ninguno de estos elementos es nulo
 
 p(A) = p(ad0/GRE1&r1)*p(GRE1/r1)*p(r1);
 
-p(ad0&GRE2&r1) = ad0&GRE2&r1/total
-p(ad1&GRE2&r1) = ad1&GRE2&r1/tota
+
+p(ad0&GRE2&r1) = (ad0&GRE2&r1 + 1)/(total + 2);
+p(ad1&GRE2&r1) = (ad1&GRE2&r1 + 1)/(tota + 2);
 
 p(GRE2/r1) = p(GRE2&r1)/[p(GRE1&r1)+p(GRE2&r1)];
 p(ad0/GRE2&r1) = p(ad0&GRE2&r1)/[p(ad0&GRE2&r1)+p(ad1&GRE2&r1)];
 
 p(B) = p(ad0/GRE2&r1)*p(GRE2/r1)*p(r1);
 
-p(GPA1&r1) = GPA1&r1/total
-p(GPA2&r1) = GPA2&r1/total
-p(ad0&GPA1&r1) = ad0&GPA1&r1/total
-p(ad1&GPA1&r1) = ad1&GPA1&r1/total
+p(GPA1&r1) = (GPA1&r1 + 1)/(total + 2);
+p(GPA2&r1) = (GPA2&r1 + 1)/(total + 2);
+p(ad0&GPA1&r1) = (ad0&GPA1&r1 + 1)/(total + 2);
+p(ad1&GPA1&r1) = (ad1&GPA1&r1 + 1)/(total + 2);
 
 p(GPA1/r1) = p(GPA1&r1)/[p(GPA1&r1)+p(GPA2&r1)];
 p(ad0/GPA1&r1) = p(ad0&GPA1&r1)/[p(ad0&GPA1&r1)+p(ad1&GPA1&r1)];
 
 p(C) = p(ad0/GPA1&r1)*p(GPA1/r1)*p(r1);
 
-p(ad0&GPA2&r1) = ad0&GPA2&r1/total
-p(ad1&GPA2&r1) = ad1&GPA2&r1/total
+p(ad0&GPA2&r1) = (ad0&GPA2&r1 + 1)/(total + 2);
+p(ad1&GPA2&r1) = (ad1&GPA2&r1 + 1)/(total + 2);
 
 
 p(GPA2/r1) = p(GPA2&r1)/[p(GPA1&r1)+p(GPA2&r1)];
@@ -132,10 +141,12 @@ p(ad0/r1) = [p(A) + p(B) + p(C) + p(D)];
 //P(GRE1&GPA2/r1) = P(GRE1&GPA2&r1) / suma P(GRE1&GPA2&r(i))
 
 tot = GRE1&GPA2&r1 + GRE1&GPA2&r2 + GRE1&GPA2&r3 + GRE1&GPA2&r4;
-P(GRE1&GPA2&r1) = GRE1&GPA2&r1/tot;
-P(GRE1&GPA2&r2) = GRE1&GPA2&r2/tot;
-P(GRE1&GPA2&r3) = GRE1&GPA2&r3/tot;
-P(GRE1&GPA2&r4) = GRE1&GPA2&r4/tot;
+P(GRE1&GPA2&r1) = (GRE1&GPA2&r1 + 1)/(tot + 4);
+P(GRE1&GPA2&r2) = (GRE1&GPA2&r2 + 1)/(tot + 4);
+P(GRE1&GPA2&r3) = (GRE1&GPA2&r3 + 1)/(tot + 4);
+P(GRE1&GPA2&r4) = (GRE1&GPA2&r4 + 1)/(tot + 4);
+// para la correccion de laplace tomo 4 categorias 
+
 
 totp = P(GRE1&GPA2&r1)+P(GRE1&GPA2&r2)+P(GRE1&GPA2&r3)+P(GRE1&GPA2&r4);
 
