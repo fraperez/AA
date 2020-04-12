@@ -74,11 +74,11 @@ class Vector_de_datos():
 
 
 class Nodo():
-    def __init__(self,nombre,padre,tipo,descendiente):
-        print("Se creo el nodo hijo descendencia ", descendiente, "",nombre, "el padre es:", padre.dar_nombre() )
+    def __init__(self,nombre,padre,tipo,generacion):
+        print("Se creo el nodo hijo generacion ", generacion, "",nombre, "el padre es:", padre.dar_nombre() )
         self.nombre = nombre
         self.padre = padre
-        self.descendiente = descendiente
+        self.generacion = generacion
         self.tipo = tipo
         self.hijo = []
         self.nuevo_vector_categorias = Vector_Categorias()
@@ -86,6 +86,7 @@ class Nodo():
         self.total,self.tot_vivo= self.contar_total()
         print()
         print(self.total,self.tot_vivo)
+        #para cada subcategoria en vector(categoria) .... crear hijo
         self.crear_nodo_hijo()
 
 
@@ -110,12 +111,15 @@ class Nodo():
     def dar_hijo(self,numero):
         return self.hijo[numero]
 
+    def dar_padre(self):
+        return self.padre
+
     #actualizo el vector de categorias, busco aquellos datos que cumplan la condicion de pertenecer a esta subcategoria
     def actualizar_parametros(self):
-        if self.descendiente != 2:
+        if self.generacion == 1:
             i = 0
             while i < total-1:
-                    
+
                     if Datos.dar_vector()[self.tipo][i] == self.dar_nombre():
                         u = 0
                         while u<3:
@@ -124,7 +128,7 @@ class Nodo():
                             u +=1
                     i += 1
 
-        else:
+        elif self.generacion == 2:
             i = 0
             while i < total-1:
 
@@ -136,6 +140,18 @@ class Nodo():
                             u += 1
                 i += 1
 
+        else:
+            i = 0
+            while i < total - 1:
+                if Datos.dar_vector()[self.tipo][i] == self.dar_nombre() and Datos.dar_vector()[self.padre.dar_tipo()][i] == self.padre.dar_nombre() and Datos.dar_vector()[self.padre.dar_padre().dar_tipo()][i] == self.padre.dar_padre().dar_nombre():
+                    u = 0
+                    while u < 3:
+                        if u != self.tipo and u != self.padre.dar_tipo():
+                            actualizar_parametros_dado(u, Datos.dar_vector(), i,
+                                                       self.nuevo_vector_categorias.dar_vector())
+                        u += 1
+                i += 1
+
 
 
     def contar_total(self):
@@ -143,7 +159,7 @@ class Nodo():
         total = 0
         tot_vivo = 0
         while(i < 3):
-           # if self.descendiente == 2:
+           # if self.generacion == 2:
                 if i != self.tipo and i !=self.padre.dar_tipo():
                   for clases in self.nuevo_vector_categorias.dar_categoria(i):
                     total += clases[0]
@@ -152,17 +168,16 @@ class Nodo():
                 i += 1
 
 
+class Nodo_Shannon(Nodo):
+    pass
 
 
-
-    def Calcular_ganancias(self,numero):
+    def Calcular_ganancias_Shannon (self,numero):
         h_vive = calcular_entropia(self.tot_vivo,self.total)
         h = dar_entropias(self.nuevo_vector_categorias.dar_categoria(numero))
 
         gain = calcular_ganancia_Shannon(h_vive,self.total,h,self.nuevo_vector_categorias.dar_categoria(numero))
         return gain
-
-
 
     def crear_nodo_hijo(self):
         if self.total == 0:
@@ -178,23 +193,61 @@ class Nodo():
         else:
             i = 0
             Mayor = 0
-            while i<3:
-                if i!=self.tipo:
-                    Mayor = mayor(Mayor,self.Calcular_ganancias(i))
-                i +=1
+            while i < 3:
+                if i != self.tipo:
+                    Mayor = mayor(Mayor, self.Calcular_ganancias_Shannon(i))
+                i += 1
             p = 0
             while p < 3:
-                if (p!= self.tipo and Mayor == self.Calcular_ganancias(p)):
-                    while len(self.hijo)<len(vector_categorias.dar_categoria(p)):
+                if (p != self.tipo and Mayor == self.Calcular_ganancias_Shannon(p)):
+                    while len(self.hijo) < len(vector_categorias.dar_categoria(p)):
                         v = self.nuevo_vector_categorias.dar_categoria(p)
-                        Nodo_Hijo = Nodo(v[len(self.hijo)][2], self, p,self.descendiente + 1)
+                        Nodo_Hijo = Nodo_Shannon(v[len(self.hijo)][2], self, p, self.generacion + 1)
                         self.agregar_hijo(Nodo_Hijo)
                         print("")
 
                 p += 1
 
-   
-   
+class Nodo_Gini(Nodo):
+    pass
+    def Calcular_ganancias_Gini(self,numero):
+        i = 0
+        gain = 1
+        while i<len(self.nuevo_vector_categorias.dar_categoria(numero)):
+            gain -= dar_cantidad_vivos(self.nuevo_vector_categorias.dar_categoria(numero),i)/total
+            i += 1
+        return gain
+
+    def crear_nodo_hijo(self):
+        if self.total == 0:
+            No_Entendi = Nodo_Terminal("No entendi")
+            self.agregar_hijo(No_Entendi)
+        elif self.total == self.tot_vivo:
+            Sobrevive = Nodo_Terminal("Sobrevive")
+            self.agregar_hijo(Sobrevive)
+
+        elif self.tot_vivo == 0:
+            No_Sobrevive = Nodo_Terminal("No Sobrevive")
+            self.agregar_hijo(No_Sobrevive)
+        else:
+            i = 0
+            Mayor = 0
+            while i < 3:
+                if i != self.tipo and i!=self.padre.dar_tipo():
+                    Mayor = mayor(Mayor, self.Calcular_ganancias_Gini(i))
+                i += 1
+            p = 0
+            while p < 3:
+
+                if (p != self.tipo and p!= self.padre.dar_tipo() and Mayor == self.Calcular_ganancias_Gini(p)):
+                    while len(self.hijo) < len(vector_categorias.dar_categoria(p)):
+                        v = self.nuevo_vector_categorias.dar_categoria(p)
+                        Nodo_Hijo = Nodo_Gini(v[len(self.hijo)][2], self, p, self.generacion + 1)
+                        self.agregar_hijo(Nodo_Hijo)
+                        print("")
+
+                p += 1
+
 class Nodo_Raiz():
 
     def __init__(self,nombre, vector_de_la_cat,tipo):
@@ -205,6 +258,7 @@ class Nodo_Raiz():
         self.tipo = tipo
         for subcategoria in self.vector_de_la_cat:
             self.agregar_hijo(subcategoria)
+
 
     def dar_hijo(self,numero):
         return self.hijo[numero]
@@ -217,12 +271,19 @@ class Nodo_Raiz():
     def dar_nombre(self):
         return self.nombre
 
+class Nodo_Raiz_Shannon(Nodo_Raiz):
+    pass
 
-    def agregar_hijo(self,subcategoria):
-        hijo = Nodo(subcategoria[2],self,self.tipo,1)
+    def agregar_hijo(self, subcategoria):
+        hijo = Nodo_Shannon(subcategoria[2], self, self.tipo, 1)
         self.hijo.append(hijo)
 
+class Nodo_Raiz_Gini(Nodo_Raiz):
+    pass
 
+    def agregar_hijo(self, subcategoria):
+        hijo = Nodo_Gini(subcategoria[2], self, self.tipo, 1)
+        self.hijo.append(hijo)
 
 class Nodo_Terminal():
     def __init__(self,nombre):
@@ -234,12 +295,12 @@ class Nodo_Terminal():
 
     def cantidad_hijos(self):
         return 0
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 def dar_clase_edad(edad):
     i = 1
     if (edad > 70):
@@ -369,11 +430,11 @@ def dar_Nodo_raiz_Shannon(vector_categorias,total):
     Mayor = mayor(m1, gain_edad)
 
     if Mayor == gain_sex:
-         return Nodo_Raiz("sexo",vector_categorias[0],0)
+         return Nodo_Raiz_Shannon("sexo",vector_categorias[0],0)
     elif Mayor == gain_clase:
-        return Nodo_Raiz("clase",vector_categorias[1],1)
+        return Nodo_Raiz_Shannon("clase",vector_categorias[1],1)
     else:
-        return Nodo_Raiz("edad",vector_categorias[2],2)
+        return Nodo_Raiz_Shannon("edad",vector_categorias[2],2)
 
 def calcular_ganancia_Gini(total,cat):
     i = 0
@@ -396,11 +457,11 @@ def dar_Nodo_raiz_Gini(vector_categorias,Survived):
     Mayor = mayor(m1, gain_edad)
 
     if Mayor == gain_sex:
-         return Nodo_Raiz("sexo",vector_categorias[0],0)
+         return Nodo_Raiz_Gini("sexo",vector_categorias[0],0)
     elif Mayor == gain_clase:
-        return Nodo_Raiz("clase",vector_categorias[1],1)
+        return Nodo_Raiz_Gini("clase",vector_categorias[1],1)
     else:
-        return Nodo_Raiz("edad",vector_categorias[2],2)
+        return Nodo_Raiz_Gini("edad",vector_categorias[2],2)
 
 
 
@@ -435,7 +496,8 @@ print("esto es de Gini")
 print("")
 print("")
 
-#NodoRaiz2 = dar_Nodo_raiz_Gini(vec,Survived)
+NodoRaiz2 = dar_Nodo_raiz_Gini(vector_categorias.dar_vector(),Survived)
 
-print(NodoRaiz.dar_nombre())
+print(NodoRaiz2.dar_nombre())
 i = 0
+print("termino")
