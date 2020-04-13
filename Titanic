@@ -86,7 +86,6 @@ class Nodo():
         self.total,self.tot_vivo= self.contar_total()
         print()
         print(self.total,self.tot_vivo)
-        #para cada subcategoria en vector(categoria) .... crear hijo
         self.crear_nodo_hijo()
 
 
@@ -128,44 +127,42 @@ class Nodo():
                             u +=1
                     i += 1
 
-        elif self.generacion == 2:
+        else:
             i = 0
+
+
             while i < total-1:
 
                 if Datos.dar_vector()[self.tipo][i] == self.dar_nombre() and Datos.dar_vector()[self.padre.dar_tipo()][i]==self.padre.dar_nombre():
+                    if(self.generacion ==2):
                         u = 0
                         while u < 3:
                             if u != self.tipo and u != self.padre.dar_tipo():
                                 actualizar_parametros_dado(u, Datos.dar_vector(), i,self.nuevo_vector_categorias.dar_vector())
                             u += 1
+                    else:
+                        if Datos.dar_vector()[self.padre.dar_padre().dar_tipo()][i]==self.padre.dar_padre().dar_nombre():
+                            actualizar_parametros_dado(self.tipo,Datos.dar_vector(),i,self.nuevo_vector_categorias.dar_vector())
                 i += 1
-
-        else:
-            i = 0
-            while i < total - 1:
-                if Datos.dar_vector()[self.tipo][i] == self.dar_nombre() and Datos.dar_vector()[self.padre.dar_tipo()][i] == self.padre.dar_nombre() and Datos.dar_vector()[self.padre.dar_padre().dar_tipo()][i] == self.padre.dar_padre().dar_nombre():
-                    u = 0
-                    while u < 3:
-                        if u != self.tipo and u != self.padre.dar_tipo():
-                            actualizar_parametros_dado(u, Datos.dar_vector(), i,
-                                                       self.nuevo_vector_categorias.dar_vector())
-                        u += 1
-                i += 1
-
 
 
     def contar_total(self):
         i = 0
         total = 0
         tot_vivo = 0
-        while(i < 3):
-           # if self.generacion == 2:
+        if self.generacion != 3:
+            while(i < 3):
                 if i != self.tipo and i !=self.padre.dar_tipo():
                   for clases in self.nuevo_vector_categorias.dar_categoria(i):
                     total += clases[0]
                     tot_vivo += clases[1]
                   return  total,tot_vivo
                 i += 1
+        else:
+            for clases in self.nuevo_vector_categorias.dar_categoria(self.dar_tipo()):
+                total += clases[0]
+                tot_vivo += clases[1]
+            return total, tot_vivo
 
 
 class Nodo_Shannon(Nodo):
@@ -205,6 +202,7 @@ class Nodo_Shannon(Nodo):
                         Nodo_Hijo = Nodo_Shannon(v[len(self.hijo)][2], self, p, self.generacion + 1)
                         self.agregar_hijo(Nodo_Hijo)
                         print("")
+                    break
 
                 p += 1
 
@@ -245,6 +243,7 @@ class Nodo_Gini(Nodo):
                         Nodo_Hijo = Nodo_Gini(v[len(self.hijo)][2], self, p, self.generacion + 1)
                         self.agregar_hijo(Nodo_Hijo)
                         print("")
+                    break
 
                 p += 1
 
@@ -467,9 +466,9 @@ def dar_Nodo_raiz_Gini(vector_categorias,Survived):
 
 
 sexo = ["female","female","female","male","male","male","male","male","female","male"]
-age = [52,71,34,67,42,25,12,5,12,5]
-Pclass = [3,3,3,1,2,2,2,3,1,1]
-Survived = [1,1,0,1,0,0,1,1,1,0]
+age = [52,71,74,7,2,25,12,5,12,5]
+Pclass = [3,2,3,1,2,2,2,3,1,1]
+Survived = [0,1,0,1,0,0,1,1,1,0]
 total = len(Survived)
 
 Nombre_categorias = ["sexo","Clase","Edad"]
