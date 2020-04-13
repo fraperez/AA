@@ -33,43 +33,22 @@ class Vector_Categorias():
     def dar_vector(self):
         return self.vector_categorias
 
-
-
 class Vector_de_datos():
     def __init__(self,Datos_sex,Datos_clase,Datos_edad,Datos_Survived):
         self.datos_sex = Datos_sex
-        self.datos_clase = self.categorizar_clase(Datos_clase)
-        self.datos_edad=(self.categorizar_edad(Datos_edad))
+        i = 0
+        self.datos_edad = []
+        self.datos_clase = []
+        while i < len (Datos_clase):
+            self.datos_clase.append(categorizar_clase(Datos_clase[i]))
+            self.datos_edad.append(categorizar_edad(Datos_edad[i]))
+            i += 1
         self.datos_survived = Datos_Survived
         self.vector = [self.datos_sex,self.datos_clase,self.datos_edad,self.datos_survived]
 
     def dar_vector(self):
         return self.vector
 
-    def categorizar_edad(self,Datos_edad):
-        vector = []
-        for edad in Datos_edad:
-            i = 1
-            if (edad > 70):
-                vector.append("cat7")
-
-            while (i < 7):
-                if (edad < 10 * i):
-                    if (edad > 10 * (i - 1)):
-                        vector.append("cat" + str(i))
-                i += 1
-        return vector
-
-    def categorizar_clase(self,Datos_clase):
-        vector = []
-        for clase in Datos_clase:
-            i = 1
-            while i<4:
-                if clase == i:
-                    vector.append("clase "+str(i))
-                i += 1
-
-        return vector
 
 
 
@@ -109,6 +88,9 @@ class Nodo():
 
     def dar_hijo(self,numero):
         return self.hijo[numero]
+
+    def vector_hijo(self):
+        return self.hijo
 
     def dar_padre(self):
         return self.padre
@@ -163,7 +145,6 @@ class Nodo():
                 total += clases[0]
                 tot_vivo += clases[1]
             return total, tot_vivo
-
 
 class Nodo_Shannon(Nodo):
     pass
@@ -247,6 +228,9 @@ class Nodo_Gini(Nodo):
 
                 p += 1
 
+
+
+
 class Nodo_Raiz():
 
     def __init__(self,nombre, vector_de_la_cat,tipo):
@@ -258,6 +242,8 @@ class Nodo_Raiz():
         for subcategoria in self.vector_de_la_cat:
             self.agregar_hijo(subcategoria)
 
+    def vector_hijo(self):
+        return self.hijo
 
     def dar_hijo(self,numero):
         return self.hijo[numero]
@@ -284,6 +270,9 @@ class Nodo_Raiz_Gini(Nodo_Raiz):
         hijo = Nodo_Gini(subcategoria[2], self, self.tipo, 1)
         self.hijo.append(hijo)
 
+
+
+
 class Nodo_Terminal():
     def __init__(self,nombre):
         print("Se creo el nodo terminal", nombre)
@@ -300,17 +289,25 @@ class Nodo_Terminal():
 
 
 
-def dar_clase_edad(edad):
-    i = 1
-    if (edad > 70):
-        return "cat7"
+def categorizar_edad(Dato_edad):
+        i = 0
+        if (Dato_edad > 70):
+            return "cat7"
 
-    while (i < 7):
-        if (edad < 10 * i):
-            if (edad > 10 * (i - 1)):
-                clase = "cat" + str(i)
-                return clase
-        i +=1
+        while (i < 7):
+            if (Dato_edad < 10 * i):
+                return("cat" + str(i))
+            i += 1
+
+def categorizar_clase(Dato_clase):
+        i = 1
+        while i<4:
+            if Dato_clase == i:
+                return ("clase "+str(i))
+            i += 1
+
+
+
 
 def contabilizar_sexo(dato_sexo,numero,catsexo):
     if (dato_sexo == "male"):
@@ -358,11 +355,19 @@ def contabilizar_todo(vector_datos,vector_de_todas_las_cat):
         contabilizar_edad(vector_datos[2][i],i,vector_de_todas_las_cat[2])
         i += 1
 
+
+
+
+
 def dar_cantidad_vivos(categoria,numero):
     return categoria[numero][1]
 
 def dar_cantidad(categoria,numero):
     return categoria[numero][0]
+
+
+
+
 
 def calcular_entropia(positivos,total):
     negativos = total - positivos
@@ -393,6 +398,19 @@ def calcular_ganancia_Shannon(h_vive,total,h,cat):
         i += 1
     return gain
 
+
+
+def calcular_ganancia_Gini(total,cat):
+    i = 0
+    gain = 1
+    while i<len(cat):
+        gain -= dar_cantidad_vivos(cat,i)/total
+        i += 1
+    return gain
+
+
+
+
 def total_vida(Survived):
     i = 0
     tot_vive = 0
@@ -407,6 +425,10 @@ def mayor(a,b):
         return a
     else:
         return b
+
+
+
+
 
 def dar_Nodo_raiz_Shannon(vector_categorias,total):
     tot_vive = total_vida(Survived)
@@ -435,13 +457,6 @@ def dar_Nodo_raiz_Shannon(vector_categorias,total):
     else:
         return Nodo_Raiz_Shannon("edad",vector_categorias[2],2)
 
-def calcular_ganancia_Gini(total,cat):
-    i = 0
-    gain = 1
-    while i<len(cat):
-        gain -= dar_cantidad_vivos(cat,i)/total
-        i += 1
-    return gain
 
 def dar_Nodo_raiz_Gini(vector_categorias,Survived):
     total = len(Survived)
@@ -462,6 +477,36 @@ def dar_Nodo_raiz_Gini(vector_categorias,Survived):
     else:
         return Nodo_Raiz_Gini("edad",vector_categorias[2],2)
 
+def sobrevivio(datos,Nodo_Raiz):
+    datos[1] = categorizar_clase(datos[1])
+    datos[2] = categorizar_edad(datos[2])
+    i = 0
+    while i<3:
+        if i == Nodo_Raiz.dar_tipo():
+            for hijo in Nodo_Raiz.vector_hijo():
+                if datos[hijo.dar_tipo()] == hijo.dar_nombre():
+                    print(datos[hijo.dar_tipo()])
+                    if len(hijo.vector_hijo()) == 1:
+                        return sob(hijo.dar_hijo(0).dar_nombre())
+                    else:
+                        for hijo2 in hijo.vector_hijo():
+                            if datos[hijo2.dar_tipo()] == hijo2.dar_nombre():
+                                if len(hijo2.vector_hijo()) == 1:
+                                    return sob(hijo2.dar_hijo(0).dar_nombre())
+                                else:
+                                    for hijo3 in hijo2.vector_hijo():
+                                        sob(hijo3.dar_hijo(0).dar_nombre())
+        i +=1
+
+
+def sob(nombre):
+    print(nombre)
+    if nombre == "Sobrevive":
+        return "Sobrevive"
+    elif nombre == "No sobrevive":
+        return "No sobrevive"
+    else:
+        return "No entendi"
 
 
 
@@ -500,3 +545,10 @@ NodoRaiz2 = dar_Nodo_raiz_Gini(vector_categorias.dar_vector(),Survived)
 print(NodoRaiz2.dar_nombre())
 i = 0
 print("termino")
+
+comparar = ["male",2,85,1]
+
+print(sobrevivio(comparar,NodoRaiz))
+comparar = ["male",2,85,1]
+
+print(sobrevivio(comparar,NodoRaiz2))
