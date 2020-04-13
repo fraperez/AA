@@ -159,8 +159,13 @@ class Nodo_Shannon(Nodo):
 
     def crear_nodo_hijo(self):
         if self.total == 0:
-            No_Entendi = Nodo_Terminal("No entendi")
-            self.agregar_hijo(No_Entendi)
+            muertos = total - total_vivo
+            if total_vivo >= muertos:
+                Sobrevive = Nodo_Terminal("Sobrevive")
+                self.agregar_hijo(Sobrevive)
+            else:
+                No_Sobrevive = Nodo_Terminal("No Sobrevive")
+                self.agregar_hijo(No_Sobrevive)
         elif self.total == self.tot_vivo:
             Sobrevive = Nodo_Terminal("Sobrevive")
             self.agregar_hijo(Sobrevive)
@@ -199,8 +204,14 @@ class Nodo_Gini(Nodo):
 
     def crear_nodo_hijo(self):
         if self.total == 0:
-            No_Entendi = Nodo_Terminal("No entendi")
-            self.agregar_hijo(No_Entendi)
+            muertos = total - total_vivo
+            if total_vivo >= muertos:
+                Sobrevive = Nodo_Terminal("Sobrevive")
+                self.agregar_hijo(Sobrevive)
+            else:
+                No_Sobrevive = Nodo_Terminal("No Sobrevive")
+                self.agregar_hijo(No_Sobrevive)
+
         elif self.total == self.tot_vivo:
             Sobrevive = Nodo_Terminal("Sobrevive")
             self.agregar_hijo(Sobrevive)
@@ -503,19 +514,17 @@ def sob(nombre):
     print(nombre)
     if nombre == "Sobrevive":
         return "Sobrevive"
-    elif nombre == "No sobrevive":
-        return "No sobrevive"
-    else:
-        return "No entendi"
+    elif nombre == "No Sobrevive":
+        return "No Sobrevive"
 
 
 
 sexo = ["female","female","female","male","male","male","male","male","female","male"]
 age = [52,71,74,7,2,25,12,5,12,5]
 Pclass = [3,2,3,1,2,2,2,3,1,1]
-Survived = [0,1,0,1,0,0,1,1,1,0]
+Survived = [0,1,0,0,0,0,1,1,1,0]
 total = len(Survived)
-
+total_vivo = total_vida(Survived)
 Nombre_categorias = ["sexo","Clase","Edad"]
 
 Datos = Vector_de_datos(sexo,Pclass,age,Survived)
