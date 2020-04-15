@@ -64,7 +64,6 @@ class Nodo():
         self.actualizar_parametros()
         self.total,self.tot_vivo= self.contar_total()
         print()
-        print(self.total,self.tot_vivo)
         self.crear_nodo_hijo()
 
 
@@ -100,7 +99,6 @@ class Nodo():
         if self.generacion == 1:
             i = 0
             while i < total-1:
-
                     if Datos.dar_vector()[self.tipo][i] == self.dar_nombre():
                         u = 0
                         while u<3:
@@ -110,9 +108,8 @@ class Nodo():
                     i += 1
 
         else:
+            #si es de segunda generacion o superior tiene que que pretenecer a esta subclase y a la subclase del padre
             i = 0
-
-
             while i < total-1:
 
                 if Datos.dar_vector()[self.tipo][i] == self.dar_nombre() and Datos.dar_vector()[self.padre.dar_tipo()][i]==self.padre.dar_nombre():
@@ -122,12 +119,13 @@ class Nodo():
                             if u != self.tipo and u != self.padre.dar_tipo():
                                 actualizar_parametros_dado(u, Datos.dar_vector(), i,self.nuevo_vector_categorias.dar_vector())
                             u += 1
+                    #se es de tercera generacion tambien tiene que pertenecer a la subclase del padre del padre
                     else:
                         if Datos.dar_vector()[self.padre.dar_padre().dar_tipo()][i]==self.padre.dar_padre().dar_nombre():
                             actualizar_parametros_dado(self.tipo,Datos.dar_vector(),i,self.nuevo_vector_categorias.dar_vector())
                 i += 1
 
-
+    #una vez que actualizo los parametros puedo contar la cantidad total y la cantidad de vivos
     def contar_total(self):
         i = 0
         total = 0
@@ -360,7 +358,7 @@ def actualizar_parametros_dado(tipo,vector_datos,numero, vector_todas_las_catego
 
 def contabilizar_todo(vector_datos,vector_de_todas_las_cat):
     i = 0
-    while i < total-1:
+    while i < total:
         contabilizar_sexo(vector_datos[0][i],i,vector_de_todas_las_cat[0])
         contabilizar_clase(vector_datos[1][i],i,vector_de_todas_las_cat[1])
         contabilizar_edad(vector_datos[2][i],i,vector_de_todas_las_cat[2])
@@ -496,7 +494,6 @@ def sobrevivio(datos,Nodo_Raiz):
         if i == Nodo_Raiz.dar_tipo():
             for hijo in Nodo_Raiz.vector_hijo():
                 if datos[hijo.dar_tipo()] == hijo.dar_nombre():
-                    print(datos[hijo.dar_tipo()])
                     if len(hijo.vector_hijo()) == 1:
                         return sob(hijo.dar_hijo(0).dar_nombre())
                     else:
@@ -511,7 +508,6 @@ def sobrevivio(datos,Nodo_Raiz):
 
 
 def sob(nombre):
-    print(nombre)
     if nombre == "Sobrevive":
         return "Sobrevive"
     elif nombre == "No Sobrevive":
@@ -551,7 +547,6 @@ print("")
 
 NodoRaiz2 = dar_Nodo_raiz_Gini(vector_categorias.dar_vector(),Survived)
 
-print(NodoRaiz2.dar_nombre())
 i = 0
 print("termino")
 
