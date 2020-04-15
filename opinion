@@ -53,7 +53,8 @@ def dar_Star_Rating(k,Vector_de_datos,Vector_a_analizar):
     while i<len(Vector_de_datos[0]):
         distancia = dar_distancia(Vector_de_datos, i ,Vector_a_analizar)
         star_Rating = Vector_de_datos[4][i]
-        vector_individual = [distancia,star_Rating]
+        posicion = i
+        vector_individual = [distancia,star_Rating,posicion]
         if i<k:
             if i == 0:
                 vector_total = vector_individual
@@ -79,6 +80,48 @@ def categorizar_vector(vector):
     vector [2] = categorizar_calificacion(vector[2])
     vector [3] = categorizar_calificacion(vector[3])
 
+def dar_Star_Rating_ponderada(k,Vector_de_datos,Vector_a_analizar):
+    i = 0
+    categorizar_vector(Vector_a_analizar)
+    while i<len(Vector_de_datos[0]):
+        distancia = dar_distancia(Vector_de_datos, i ,Vector_a_analizar)
+        star_Rating = Vector_de_datos[4][i]
+        posicion = i
+        vector_individual = [distancia, star_Rating, posicion]
+        if i<k:
+            if i == 0:
+                vector_total = vector_individual
+            else:
+                vector_total = ordenar_y_agregar(vector_total,vector_individual,i)
+        elif distancia<vector_total[0][0]:
+            vector_total = ordenar(vector_total,vector_individual)
+        i +=1
+    contar_Star_Rating_Ponderada = [0,0,0,0,0]
+    
+    
+    #aca cambia con respecto a no ponderada
+    dist_0 = 0
+    for vector_individual in vector_total:
+        rating = vector_individual[1]
+        i = 1
+        while i < 5:
+            if rating == i:
+                distancia = dar_distancia(Vector_de_datos,vector_individual[2],Vector_a_analizar)
+                if distancia == 0:
+                    dist_0 = 1
+                    print("el rating de este comentario es: ", rating)
+                else:
+                    contar_Star_Rating_Ponderada[i-1] += 1/dar_distancia(Vector_de_datos,vector_individual[2],Vector_a_analizar)
+                    break
+            i +=1
+
+    if dist_0 == 0:
+        rating_final = posicion_mayor(contar_Star_Rating_Ponderada) + 1
+        print ("el rating de este comentario es: ",rating_final)
+
+
+
+
 
 
 def promedio_palabras_StarRating_1(Categoria_StarRating,Categoria_wordcount):
@@ -89,6 +132,7 @@ def promedio_palabras_StarRating_1(Categoria_StarRating,Categoria_wordcount):
         if Categoria_StarRating[i] == 1:
             total_palabras += Categoria_wordcount[i]
             total_rating_1 += 1
+           i += 1     
     promedio = total_palabras/total_rating_1
     print("El promedio de palabras utilizadas en comentarios de rating 1 es: ",promedio)
 
@@ -175,8 +219,10 @@ Star_Rating = [1,1,2,2,2,3,3]
 sentimental_value = Star_Rating
 
 vector = Vector_de_datos(ReviewTitle,wordcount,titlesentiment,textsentiment,Star_Rating,sentimental_value)
-vec_analizar = ["a",1,"negative","negative",3,2]
+vec_analizar = ["a",1,"negative","negative",3,2.5]
 
 
 
 dar_Star_Rating(3,vector.dar_vector(),vec_analizar)
+
+dar_Star_Rating_ponderada(3,vector.dar_vector(),vec_analizar)
