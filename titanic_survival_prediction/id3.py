@@ -12,27 +12,28 @@ class ID3(object):
     def __init__(self, gain_function):
         self.gain = gain_function
 
-    def train(self, train_data, objective_attr, objective_universe, attrs):
+    def train(self, train_data, objective_attr, attrs):
         '''
         build a decsion tree based on the gain function and the train data set
         input:
-            - objective_attr: the attribute that we want to classify.
+            - objective_attr: dict containing the attribute that we want to classify and the unierse.
             - train_data: training dtaset.
             - attrs: dict with other attributes which the tree can expect and their universe.
         
         output: a DecisionTree object
         '''
-
+        objective_universe = list(objective_attr.values()).pop()
+        objective_attr = list(objective_attr.keys()).pop()
         # sanity checks
         for value in objective_universe:
         
             if len(train_data[getattr(train_data, objective_attr) == value]) == len(train_data):
-                return DecisionTreee(Node(value))
+                return DecisionTreee(Node(value, objective_universe))
 
 
         if len(attrs) == 0:
             value = get_mode(getattr(train_data, objective_attr))
-            return DecisionTreee(Node(value))
+            return DecisionTreee(Node(value, objective_universe))
 
         # now, if we are here. There are multple attrs to evaluate.
         # we calculate the gain for each one and declare the highest as the root.
@@ -72,19 +73,15 @@ class ID3(object):
         return node
         
 
-
-
-
-        
-
     def get_max_gain_attr(self, train_data, objective_attr, objective_universe, attrs):
         max_attr = None
         gain = 0.0
         for attr, universe in attrs.items():
             new_gain = self.gain(train_data, objective_attr, objective_universe, attr, universe)
-            if new_gain > gain:
+            if new_gain > gain or max_attr == None:
                 gain = new_gain
                 max_attr = attr
+
         return max_attr
 
 
@@ -147,6 +144,20 @@ def shanon_gain(cls, goal_attr, goal_universe, attr, attr_universe):
 
 
     return gain
+
+
+def gini_gain(cls, goal_attr, goal_universe, attr, attr_universe):
+    '''
+    Gini gain is based on the gini index
+    Params:
+    - cls: the data frame where columns represent attrs.
+    - goal_attr: the goal_attr for the tree
+    - goal_universe: possible classes for goal attr
+    - attr: the specific attr to analyze
+    - attr_univers: the list of possible values of attr
+    '''
+
+    pass
 
 
 
