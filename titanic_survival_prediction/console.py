@@ -73,10 +73,13 @@ train_data, test_data = train_test_split(data, args['test'])
 
 
 # now we build each method
-
-predictior = RandomForest(shanon_gain)
-predictior.train(args['num_tree'], args['n_data'], args['n_attr'], train_data, goal_attr, attrs)
-
+if args['predictor'] == 'random_forest':
+    predictior = RandomForest(shanon_gain)
+    predictior.train(args['num_tree'], args['n_data'], args['n_attr'], train_data, goal_attr, attrs)
+else:
+    gain_func = shanon_gain if args['gain'] == 'shanon' else shanon_gain
+    id3 = ID3(gain_func)
+    predictior = id3.train(train_data, goal_attr, attrs)
 # now we test
 predictions = []
 # make predictions

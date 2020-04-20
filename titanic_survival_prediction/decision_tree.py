@@ -3,8 +3,9 @@
 DecisionTree represent an m-ary tree created by ID3
 '''
 
+
 class DecisionTreee(object):
-    def __init__(self, root_node = None):
+    def __init__(self, root_node=None):
         self.root = root_node
 
     def predict(self, case):
@@ -18,14 +19,12 @@ class DecisionTreee(object):
     def _predict(self, case, node):
         if node.is_leaf():
             return node.get_value()
-        
+
         next_node = node.get_children()
         for vertex in next_node:
-            if vertex.get_value() ==  case.get(node.get_value()):
+            if vertex.get_value() == case.get(node.get_value()):
                 next_node = vertex.get_to()
                 return self._predict(case, next_node)
-
-    
 
 
 class Node(object):
@@ -52,7 +51,7 @@ class Node(object):
         return self.value
 
     def get_universe(self):
-        return self.universe 
+        return self.universe
 
     def is_leaf(self):
         return len(self.children_vertexes) == 0
@@ -63,7 +62,7 @@ class Vertex(object):
         self.value = value
         self.from_node = from_node
         self.to_node = to_node
-    
+
     def get_value(self):
         return self.value
 

@@ -6,6 +6,7 @@ import operator
 KNN implementation using pandas and numpy for matrix representation
 '''
 
+
 class KNN(object):
     def __init__(self, k_neighbours, goal_attr, weighted=False):
         '''
@@ -36,8 +37,6 @@ class KNN(object):
         for index, row in trainset.iterrows():
             self.samples.append((row.to_dict(), self._label(row)))
 
-        
-
     def _label(self, case):
         '''
         Define corresponding label for a given example
@@ -53,7 +52,8 @@ class KNN(object):
 
         distances_heap = []
         for sample in self.samples:
-            heappush(distances_heap, (self.distance_to(sample[0], case), sample[1]))
+            heappush(distances_heap, (self.distance_to(
+                sample[0], case), sample[1]))
 
         # now we get the k first neighbours
         neighbour_labels = {}
@@ -65,26 +65,24 @@ class KNN(object):
                 return label[1]
 
             weight = 1/label[0] if self.weighted else 1
-            
-            neighbour_labels[label[1]] = neighbour_labels.get(label, 0) +  weight
-        
+
+            neighbour_labels[label[1]] = neighbour_labels.get(
+                label, 0) + weight
+
         # return the most frequent one
 
         return max(neighbour_labels.items(), key=operator.itemgetter(1))[0]
-    
+
     def distance_to(self, from_vec, to_vec):
         '''
         Calculate euclidean distance between from_vec and to_vec
         we use attrs defined during training
         '''
 
-        distance  = 0.0
+        distance = 0.0
 
         for col in self.attrs:
             distance += (from_vec.get(col, 0.0) - to_vec.get(col, 0.0)) ** 2
-        
+
         return math.sqrt(distance)
-            
-
-
 

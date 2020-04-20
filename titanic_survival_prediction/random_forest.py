@@ -35,7 +35,6 @@ class RandomForest(object):
             attrs_batch = dict(attrs_batch)
             tree = id3.train(mini_batch, goal_attr, attrs_batch)
             self.forest.append(tree)
-        
 
     def _train_split(self, df, percentage):
         '''
@@ -53,14 +52,12 @@ class RandomForest(object):
         return train_df
 
     def predict(self, case):
-        
+
         predictions = []
 
         for tree in self.forest:
             individual_prediciton = tree.predict(case)
             predictions.append(individual_prediciton)
-        
+
         # get the most voted class
         return get_mode(predictions)
-        
-    

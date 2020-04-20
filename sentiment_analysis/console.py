@@ -6,20 +6,34 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sn
 import numpy as np
 import argparse
+
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", required=True,
-	help="path to input dataset")
+                help="Path to input dataset")
 ap.add_argument('-k', '--neighbour', required=True, type=int, default=3,
-    help='number of neighbours to use (must be odd) [default = 3]')
+                help='Number of neighbours to use (must be odd) [default = 3]')
 ap.add_argument('-t', '--test', required=True, type=float, default=0.3,
-    help='percentage of data to use as test')
+                help='Percentage of data to use as test')
+ap.add_argument('-w', '--weighted', type=str2bool, nargs='?', const=True, default=False,
+                help='Indicates wheather or not knn use a weighted distance.')
 args = vars(ap.parse_args())
 
 
-
 def load_data(path, separator=',', encoding='ISO-8859-1'):
-    df = pd.read_csv(path, sep= separator, encoding=encoding)
+    df = pd.read_csv(path, sep=separator, encoding=encoding)
     return df
 
 
@@ -50,8 +64,9 @@ data[cat_columns] = data[cat_columns].apply(lambda x: x.cat.codes)
 
 train_set, test_set = train_test_split(data, 1 - args['test'])
 
-knn = KNN(args['neighbour'], 'Star Rating')
-knn.train(train_set, ['sentimentValue', 'textSentiment', 'titleSentiment', 'wordcount'])
+knn = KNN(args['neighbour'], 'Star Rating', args['weighted'])
+knn.train(train_set, ['sentimentValue', 'textSentiment',
+                      'titleSentiment', 'wordcount'])
 
 
 # now we test the results
@@ -65,7 +80,8 @@ for index, row in test_set.iterrows():
 # build confusion matrix
 labels = set(expected)
 labels = list(labels)
-conf_matrix = confusion_matrix(np.array(expected), np.array(predictions), labels = labels)
+conf_matrix = confusion_matrix(
+    np.array(expected), np.array(predictions), labels=labels)
 df_cm = pd.DataFrame(conf_matrix, index=list(labels), columns=list(labels))
 sn.heatmap(df_cm, annot=True)
 

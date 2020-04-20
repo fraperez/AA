@@ -19,17 +19,16 @@ class ID3(object):
             - objective_attr: dict containing the attribute that we want to classify and the unierse.
             - train_data: training dtaset.
             - attrs: dict with other attributes which the tree can expect and their universe.
-        
+
         output: a DecisionTree object
         '''
         objective_universe = list(objective_attr.values()).pop()
         objective_attr = list(objective_attr.keys()).pop()
         # sanity checks
         for value in objective_universe:
-        
+
             if len(train_data[getattr(train_data, objective_attr) == value]) == len(train_data):
                 return DecisionTreee(Node(value, objective_universe))
-
 
         if len(attrs) == 0:
             value = get_mode(getattr(train_data, objective_attr))
@@ -38,10 +37,11 @@ class ID3(object):
         # now, if we are here. There are multple attrs to evaluate.
         # we calculate the gain for each one and declare the highest as the root.
 
-        tree_core = self._generate_tree(train_data, objective_attr, objective_universe, attrs, None)
+        tree_core = self._generate_tree(
+            train_data, objective_attr, objective_universe, attrs, None)
 
         tree = DecisionTreee(tree_core)
-        
+
         return tree
 
     def _generate_tree(self, train_data, objective_attr, objective_universe, attrs, parent):
@@ -50,34 +50,35 @@ class ID3(object):
         '''
         # sanity checks
         for value in objective_universe:
-        
+
             if len(train_data[getattr(train_data, objective_attr) == value]) == len(train_data):
                 return Node(value, objective_universe, parent)
-
 
         if len(attrs) == 0:
             value = get_mode(getattr(train_data, objective_attr))
             return Node(value, objective_attr, parent)
 
         # if we are here, then this is not a leaf node
-        max_attr = self.get_max_gain_attr(train_data, objective_attr, objective_universe, attrs)
+        max_attr = self.get_max_gain_attr(
+            train_data, objective_attr, objective_universe, attrs)
         values = attrs.pop(max_attr, None)
         node = Node(max_attr, attrs.get(max_attr), parent)
 
         # generate all children trees
         for value in values:
-            to_node = self._generate_tree(train_data[getattr(train_data, max_attr) == value], objective_attr, objective_universe, attrs, node)
+            to_node = self._generate_tree(train_data[getattr(
+                train_data, max_attr) == value], objective_attr, objective_universe, attrs, node)
             vertex = Vertex(value, node, to_node)
             node.add_vertex(vertex)
 
         return node
-        
 
     def get_max_gain_attr(self, train_data, objective_attr, objective_universe, attrs):
         max_attr = None
         gain = 0.0
         for attr, universe in attrs.items():
-            new_gain = self.gain(train_data, objective_attr, objective_universe, attr, universe)
+            new_gain = self.gain(train_data, objective_attr,
+                                 objective_universe, attr, universe)
             if new_gain > gain or max_attr == None:
                 gain = new_gain
                 max_attr = attr
@@ -92,7 +93,7 @@ def get_mode(array):
 
     values = {}
     for value in array:
-        values[value] = values.get(value, 0) +  1
+        values[value] = values.get(value, 0) + 1
 
     return max(values.items(), key=operator.itemgetter(1))[0]
 
@@ -113,7 +114,8 @@ def entropy(dataset, goal_attr, universe):
 
     shannon_entropy = 0
     for value in universe:
-        frequency = len(dataset[getattr(dataset, goal_attr) == value]) / float(len(dataset))
+        frequency = len(
+            dataset[getattr(dataset, goal_attr) == value]) / float(len(dataset))
         if frequency > 0:
             shannon_entropy -= frequency * math.log2(frequency)
 
@@ -137,11 +139,11 @@ def shanon_gain(cls, goal_attr, goal_universe, attr, attr_universe):
 
     gain = entropy(cls, goal_attr, goal_universe)
 
-    for value in  attr_universe:
+    for value in attr_universe:
         frequency = len(cls[getattr(cls, attr) == value]) / float(len(cls))
-        etpy  = entropy(cls[getattr(cls, attr) == value], goal_attr, goal_universe)
+        etpy = entropy(cls[getattr(cls, attr) == value],
+                       goal_attr, goal_universe)
         gain -= frequency * etpy
-
 
     return gain
 
@@ -158,7 +160,4 @@ def gini_gain(cls, goal_attr, goal_universe, attr, attr_universe):
     '''
 
     pass
-
-
-
 
