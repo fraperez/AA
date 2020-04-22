@@ -11,6 +11,12 @@ class RandomForest(object):
         '''
         self.gain = gain_function
 
+    def get_tree_size(self):
+        tree = self.forest.pop()
+        nodes = tree.get_tree_size()
+        return nodes
+
+
     def train(self, n_tree, n_data, n_attr, dataset, goal_attr, attrs):
         '''
         To train a random forest, we build each tree and the decide upond the most common answer.

@@ -1,4 +1,4 @@
-from id3 import ID3, shanon_gain
+from id3 import ID3, shanon_gain, gini_gain
 from random_forest import RandomForest
 import argparse
 import random
@@ -28,7 +28,7 @@ ap.add_argument('-nattr', '--n_attr', required=True, type=int, default=3,
     help='number of attr to analyze (depth of tree) default = 3')
 ap.add_argument('-t', '--test', required=True, type=float, default=0.3,
     help='percentage of data to use as test')
-args = vars(ap.parse_args())
+# args = vars(ap.parse_args())
 
 
 def load_data(path, separator=',', encoding='ISO-8859-1'):
@@ -49,48 +49,48 @@ def train_test_split(df, test_percentage):
     test_df = df.drop(train_indexes)
     return train_df, test_df
 
+if __name__ == '__main__':
+    data = load_data(args['dataset'], '\t', encoding='utf-8')
+    # just fill nans
+    data = data.fillna(35)
 
-data = load_data(args['dataset'], '\t', encoding='utf-8')
-# just fill nans
-data = data.fillna(35)
+    # remember we need to categorize age
+    age_labels = ['child', 'teenage', 'young_adult', 'adult', 'old', 'retired']
+    categorical_age = pd.cut(data.Age, len(age_labels), labels=['child', 'teenage', 'young_adult', 'adult', 'old', 'retired'])
+    data.Age = categorical_age
 
-# remember we need to categorize age
-age_labels = ['child', 'teenage', 'young_adult', 'adult', 'old', 'retired']
-categorical_age = pd.cut(data.Age, len(age_labels), labels=['child', 'teenage', 'young_adult', 'adult', 'old', 'retired'])
-data.Age = categorical_age
+    # general settings
+    attrs = {
+        'Age': age_labels,
+        'Pclass': [1,2,3],
+        'Sex': ['male', 'female']
 
-# general settings
-attrs = {
-    'Age': age_labels,
-    'Pclass': [1,2,3],
-    'Sex': ['male', 'female']
+    }
 
-}
+    goal_attr = {'Survived': [0,1]}
 
-goal_attr = {'Survived': [0,1]}
-
-train_data, test_data = train_test_split(data, args['test'])
+    train_data, test_data = train_test_split(data, args['test'])
 
 
-# now we build each method
-if args['predictor'] == 'random_forest':
-    predictior = RandomForest(shanon_gain)
-    predictior.train(args['num_tree'], args['n_data'], args['n_attr'], train_data, goal_attr, attrs)
-else:
-    gain_func = shanon_gain if args['gain'] == 'shanon' else shanon_gain
-    id3 = ID3(gain_func)
-    predictior = id3.train(train_data, goal_attr, attrs)
-# now we test
-predictions = []
-# make predictions
-for index, case in test_data.iterrows():
-    case = case.to_dict()
-    predictions.append(predictior.predict(case))
+    # now we build each method
+    if args['predictor'] == 'random_forest':
+        predictior = RandomForest(shanon_gain)
+        predictior.train(args['num_tree'], args['n_data'], args['n_attr'], train_data, goal_attr, attrs)
+    else:
+        gain_func = shanon_gain if args['gain'] == 'shanon' else gini_gain
+        id3 = ID3(gain_func)
+        predictior = id3.train(train_data, goal_attr, attrs)
+    # now we test
+    predictions = []
+    # make predictions
+    for index, case in test_data.iterrows():
+        case = case.to_dict()
+        predictions.append(predictior.predict(case))
 
-# build confusion matrix
-labels = [1, 0]
-conf_matrix = confusion_matrix(test_data.Survived.to_list(), predictions, labels=labels)
-df_cm = pd.DataFrame(conf_matrix, index=['survived', 'not survived'], columns=['survived', 'not survived'])
-sn.heatmap(df_cm, annot=True)
+    # build confusion matrix
+    labels = [1, 0]
+    conf_matrix = confusion_matrix(test_data.Survived.to_list(), predictions, labels=labels)
+    df_cm = pd.DataFrame(conf_matrix, index=['survived', 'not survived'], columns=['survived', 'not survived'])
+    sn.heatmap(df_cm, annot=True)
 
-plt.show()
+    plt.show()

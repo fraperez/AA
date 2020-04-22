@@ -104,7 +104,7 @@ def entropy(dataset, goal_attr, universe):
 
     Entropy(S) = - (sum(P[goal_attr = i] * log2(P[goal_attr = i]) ))
 
-    Paras: 
+    Paras:
         - dataset: pandas df of examples, each column should contain an attr
         - goal_attr : name of attr to classify in dataset objts.
         - universe: possible values of given goal_attr.
@@ -157,7 +157,42 @@ def gini_gain(cls, goal_attr, goal_universe, attr, attr_universe):
     - goal_universe: possible classes for goal attr
     - attr: the specific attr to analyze
     - attr_univers: the list of possible values of attr
+
+    Obs:
+    As the gini gain works inverse to the entropy gain function. We deliverately invert the gini gain
     '''
 
-    pass
+    gain = 0
+
+    for value in attr_universe:
+        frequency = len(cls[getattr(cls, attr) == value]) / float(len(cls))
+        gini = gini_index(cls[getattr(cls, attr) == value],
+                       goal_attr, goal_universe)
+        gain += frequency * gini
+
+    return 1.0/gain if gain > 0 else 0.0
+
+
+
+def gini_index(dataset, goal_attr, universe):
+    '''
+    Calculate gini index for a given attr
+    Params:
+    - dataset : dataframe with all columns and examples to take frequency.
+    - goal_attr: the column to base calcualtions on
+    '''
+
+    if len(dataset) == 0:
+        return 1
+
+    gini = 1
+
+    for value in universe:
+        frequency = len(
+            dataset[getattr(dataset, goal_attr) == value]) / float(len(dataset))
+
+        gini -= frequency ** 2
+
+    return gini
+
 

@@ -8,6 +8,23 @@ class DecisionTreee(object):
     def __init__(self, root_node=None):
         self.root = root_node
 
+
+    def get_tree_size(self):
+        '''
+        Returns the amount of nodes used.
+        '''
+        return self._tree_size(self.root)
+
+    def _tree_size(self, current):
+        if current == None:
+            return 0
+
+        nodes = 1
+        for child in current.get_children():
+            nodes += self._tree_size(child.get_to())
+
+        return nodes
+
     def predict(self, case):
         '''
         Predict a value for the given case

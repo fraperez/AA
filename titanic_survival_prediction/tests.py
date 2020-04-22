@@ -2,7 +2,7 @@ import math
 import pandas as pd
 from decision_tree import DecisionTreee, Node, Vertex
 import operator
-from id3 import ID3, shanon_gain, entropy
+from id3 import ID3, shanon_gain, entropy, gini_index, gini_gain
 from random_forest import RandomForest
 
 ################################ TESTS ######################################################
@@ -36,6 +36,17 @@ def test_shanon_gain():
     expected += -(8/14.0) * 0.8112781244591328 - (6/14.0) * 1
     assert result == expected
 
+def test_gini_index():
+    df = {
+        'class': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B'],
+        'attr1': [0, 0, 0, 0, 1, 1, 1, 0, 1, 0],
+        'attr2': [33, 54, 56, 42, 50, 55, 31, -4, 77, 49]
+    }
+    df = pd.DataFrame(df)
+    result = gini_gain(df, 'class', ['A', 'B'], 'attr1', [0, 1])
+    expected = 0.4166666666666667
+
+    assert result == expected
 
 def test_id3():
     goal_attr = 'play'
@@ -128,3 +139,5 @@ test_shanon_gain()
 test_id3()
 
 test_random_forest()
+
+test_gini_index()

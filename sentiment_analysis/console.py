@@ -51,7 +51,13 @@ def train_test_split(df, train_percentage):
     return train_df, test_df
 
 
-data = load_data('data/reviews_sentiment.csv', ';')
+data = load_data(args['dataset'], ';')
+# How many words avg does 1 star ratings have?
+size_words = []
+d = data[data['Star Rating'] == 1]
+for idx, row in d.iterrows():
+    size_words.append(row['wordcount'])
+print('Average word count is => {}'.format(sum(size_words)/ float(len(d))))
 
 data = data.fillna(method='bfill', axis=1)
 # now we bring categories to numbers and work around the NaNs
