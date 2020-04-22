@@ -93,4 +93,6 @@ if __name__ == '__main__':
     df_cm = pd.DataFrame(conf_matrix, index=['survived', 'not survived'], columns=['survived', 'not survived'])
     sn.heatmap(df_cm, annot=True)
 
+    accuracy = (conf_matrix[0,0] + conf_matrix[1, 1]) / float(len(test_data))
+    print(f'[ACCURACY] {accuracy}  (max 1)')
     plt.show()
